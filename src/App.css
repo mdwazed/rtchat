@@ -1,38 +1,128 @@
+#root {
+  height: 100%;
+}
+
 .App {
+  height: 100%;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #484848;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.join {
+  flex: 0 0 25%;
+  background-color: #0099ff;
+  padding: 15px 20px;
+  border-radius: 5px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.join-form {
   display: flex;
   flex-direction: column;
+}
+
+.join-form input {
+  flex: 0 0 100%;
+  padding-left: 10px;
+  height: 30px;
+  font-size: 17px;
+  padding: 5px;
+  justify-content: space-evenly;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
+.join-form a {
+  text-decoration: none;
+  text-align: center;
+  color: white;
+  font-weight: 600;
+  font-size: 17px;
+  padding: 5px 0;
+  margin-top: 10px;
+  background-color: #4caf50;
+}
+
+.chat {
+  width: 500px;
+  display: flex;
+  flex-direction: row;
+  border: 2px solid dodgerblue;
+  border-radius: 5px;
+  background-color: white;
+}
+
+.user-list {
+  width: 100px;
+  border-right: 2px solid dodgerblue;
+}
+
+.chat-section {
+  height: 100%;
+  flex: auto;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+}
+
+.chat-head {
+  flex: 0 0 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 40px;
+  background-color: dodgerblue;
+  color: white;
+  font-size: 17px;
+  font-weight: 600;
+  padding: 5px 10px;
+}
+
+.chat-head a {
+  text-decoration: none;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.chat-box {
+  flex: 0 0 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+  justify-content: flex-end;
+  padding: 10px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.chat-box input {
+  flex: 0 0 100%;
+  height: 30px;
+  font-size: 20px;
+  margin-top: 15px;
+  padding: 5px;
+}
+
+.messages {
+  float: 0 0 100%;
+  display: flex;
+  flex-direction: column;
+  height: 50vh;
+}
+
+.messages .message {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  background-color: #f1f0f0;
+  margin: 5px 0;
+  padding: 5px;
+  border-radius: 5px;
+  align-items: flex-start;
+}
+
+.messages .message.self {
+  background-color: #0099ff;
+  color: white;
+  align-items: flex-end;
 }
