@@ -1,1 +1,0 @@
-export const defaultKey = 'r39t9gvlbvkjvdkjvbbj5twtwou4588wfdsi23r'
