@@ -3,6 +3,7 @@ import {useLocation, Link} from "react-router-dom";
 import queryString from "query-string";
 import io from "socket.io-client";
 import ScrollToBottom from "react-scroll-to-bottom";
+import {encryptedText} from "../util/encrypt";
 
 let socket;
 const Chat = () => {
@@ -37,6 +38,7 @@ const Chat = () => {
     const sendMessage = (e) => {
         if (e.key === "Enter" && e.target.value) {
             socket.emit("message", e.target.value);
+            encryptedText(e.target.value)
             e.target.value = "";
         }
     };
@@ -62,7 +64,6 @@ const Chat = () => {
                                 className={`message ${name === message.user ? "self" : ""}`}
                             >
                                 <span className="user">{message.user}</span>
-                                {/*<span className="message-text">{message.text}</span>*/}
                                 <span className="message-text">{message.text}</span>
                             </div>
                         ))}
