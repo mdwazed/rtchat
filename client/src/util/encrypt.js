@@ -1,5 +1,5 @@
 import * as openpgp from "openpgp";
-let publicKey, privateKey;
+var publicKey, privateKey;
 
 // let options = {
 //     userIDs: { name: 'Alice', email: 'alice@example.com' },
@@ -8,23 +8,24 @@ let publicKey, privateKey;
 // }
 
 const generateKey = async () => {
-    const { privateKey, publicKey } = await openpgp.generateKey({
+    const key = await openpgp.generateKey({
         type: 'rsa', // Type of the key
         rsaBits: 4096, // RSA key size (defaults to 4096 bits)
         userIDs: [{ name: 'Jon Smith', email: 'jon@example.com' }], // you can pass multiple user IDs
         passphrase: 'super long and hard to guess secret' // protects the private key
     });
-    console.log(privateKey, publicKey)
+    console.log(key)
+    privateKey = key.privateKey
+    publicKey = key.publicKey
+
 };
 export const encryptedText = async (plainText) => {
     if(!publicKey && !privateKey) {
         console.log('generating keys')
-        console.log(generateKey())
+        console.log(await generateKey())
     }
-    let message = await openpgp.createMessage({text: 'hellow world'})
-    console.log(JSON.stringify(message))
+    let message = await openpgp.createMessage({text: plainText})
     openpgp.readKey({armouredKey: publicKey})
-    console.log(`my public key ${publicKey}`);
     const encrypted = await openpgp.encrypt({
         message: message,
         encryptionKeys: publicKey
