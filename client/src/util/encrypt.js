@@ -1,26 +1,37 @@
-const openpgp = require('openpgp') // use as CommonJS, AMD, ES6 module or via window.openpgp
+import * as openpgp from "openpgp";
 let publicKey, privateKey;
 
-let options = {
-    userIDs: { name: 'Alice', email: 'alice@example.com' },
-    passphrase: 'secret',
-}
+// let options = {
+//     userIDs: { name: 'Alice', email: 'alice@example.com' },
+//     passphrase: 'secret',
+//     format: 'armored'
+// }
 
-const generateKey = () => {
-    openpgp.generateKey(options).then((key) => {
-        publicKey = key.privateKey
-        privateKey = key.publicKey
-    })
-}
-export const encryptedText = (plainText) => {
+const generateKey = async () => {
+    const { privateKey, publicKey } = await openpgp.generateKey({
+        type: 'rsa', // Type of the key
+        rsaBits: 4096, // RSA key size (defaults to 4096 bits)
+        userIDs: [{ name: 'Jon Smith', email: 'jon@example.com' }], // you can pass multiple user IDs
+        passphrase: 'super long and hard to guess secret' // protects the private key
+    });
+    console.log(privateKey, publicKey)
+};
+export const encryptedText = async (plainText) => {
     if(!publicKey && !privateKey) {
-        generateKey()
+        console.log('generating keys')
+        console.log(generateKey())
     }
-    let message = openpgp.createMessage({text: 'hello world!'})
-    console.log(`type message ${typeof message}`)
-    openpgp.encrypt({message: message, encryptionKeys: publicKey}).then((encryptedData) => {
-        console.log(encryptedData.data)
+    let message = await openpgp.createMessage({text: 'hellow world'})
+    console.log(JSON.stringify(message))
+    openpgp.readKey({armouredKey: publicKey})
+    console.log(`my public key ${publicKey}`);
+    const encrypted = await openpgp.encrypt({
+        message: message,
+        encryptionKeys: publicKey
+    }).then((encryptedMessage) => {
+        console.log(encryptedMessage)
     })
+    console.log(encrypted);
 }
 
 
