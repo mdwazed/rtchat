@@ -3,7 +3,7 @@ import {useLocation, Link} from "react-router-dom";
 import queryString from "query-string";
 import io from "socket.io-client";
 import ScrollToBottom from "react-scroll-to-bottom";
-import {encryptedText} from "../util/encrypt";
+import {decryptedText, encryptedText} from "../util/encrypt";
 
 let socket;
 const Chat = () => {
@@ -35,11 +35,14 @@ const Chat = () => {
         };
     }, [name, room]);
 
-    const sendMessage = (e) => {
+    const sendMessage = async (e) => {
         if (e.key === "Enter" && e.target.value) {
             socket.emit("message", e.target.value);
-            encryptedText(e.target.value)
             e.target.value = "";
+            const msg = await encryptedText(e.target.value)
+            console.log(`encrypted msg ${msg}`)
+            const dmsg = await decryptedText(msg)
+            console.log(`decrypted msg ${dmsg}`)
         }
     };
 
@@ -59,6 +62,7 @@ const Chat = () => {
                 <div className="chat-box">
                     <ScrollToBottom className="messages">
                         {messages.map((message, index) => (
+
                             <div
                                 key={index}
                                 className={`message ${name === message.user ? "self" : ""}`}
