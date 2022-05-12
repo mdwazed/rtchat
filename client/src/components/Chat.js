@@ -42,7 +42,7 @@ const Chat = () => {
             const msg = await encryptedText(e.target.value)
             console.log(`encrypted msg ${msg}`)
             const dmsg = await decryptedText(msg)
-            console.log(`decrypted msg ${dmsg}`)
+            console.log(`decrypted msg ${JSON.stringify(dmsg)}`)
         }
     };
 

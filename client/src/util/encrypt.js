@@ -35,11 +35,18 @@ export const decryptedText = async (encryptedMsg) => {
     const message = await openpgp.readMessage({
         armoredMessage: encryptedMsg // parse armored message
     });
+    console.log(`decryption key ${decryptionKeys}`)
+    // console.log(`message readMessage ${JSON.stringify(message)}`)
     const { data: decrypted, signatures } = await openpgp.decrypt({
         message,
         verificationKeys: publicKey, // optional
         decryptionKeys: decryptionKeys
     });
-    await console.log(`signatures ${signatures}`)
-    return decrypted
+    try {
+        await signatures[0].verified; // throws on invalid signature
+        console.log('Signature is valid');
+    } catch (e) {
+        throw new Error('Signature could not be verified: ' + e.message);
+    }
+    return {decrypted, signatures}
 }
