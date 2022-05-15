@@ -38,11 +38,10 @@ const Chat = () => {
     const sendMessage = async (e) => {
         if (e.key === "Enter" && e.target.value) {
             socket.emit("message", e.target.value);
+            const encMsg = await encryptedText(e.target.value)
+            const decMsg = await decryptedText(encMsg)
+            console.log(decMsg)
             e.target.value = "";
-            const msg = await encryptedText(e.target.value)
-            console.log(`encrypted msg ${msg}`)
-            const dmsg = await decryptedText(msg)
-            console.log(`decrypted msg ${JSON.stringify(dmsg)}`)
         }
     };
 
