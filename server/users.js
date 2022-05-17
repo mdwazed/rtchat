@@ -20,7 +20,10 @@ const addUser = ({id, name, room, key}) => {
     };
 
     users.push(user);
-    userPubKeys.push({name, key})
+    if (!userPubKeys.map(u=>u.name).includes(name)) {
+        userPubKeys.push({name, key})
+        console.log(`User ${name} key updated ${key}`)
+    }
     return user;
 };
 
@@ -32,14 +35,14 @@ const removeUser = (id) => {
     }
 };
 
-const getUserById = (id) => {return users.find((user) => user.id === id)}
-const getUserExceptId = (id) => {return users.filter((user) => user.id !== id)}
-const getKeyByUserName = (name) => {return userPubKeys.find((user) => user.name === name)}
+const getUserById = (id) => {
+    return users.find((user) => user.id === id)
+}
+const getKeyByUserName = (name) => {
+    return userPubKeys.find((user) => user.name === name.toLowerCase())
+}
 
-const getRoomUsers = (room) => {
-    const roomUsers = users.filter((user) => user.room === room);
-    return roomUsers;
-};
+const getRoomUsers = (room) => {return users.filter((user) => user.room === room);};
 
 module.exports = {
     addUser,
@@ -47,5 +50,4 @@ module.exports = {
     getUserById,
     getRoomUsers,
     getKeyByUserName,
-    getUserExceptId,
 };

@@ -9,7 +9,7 @@ let socket;
 const Chat = () => {
     const {search} = useLocation();
     const {name, room} = queryString.parse(search);
-    const [user, setUser] = useState({})
+    const [userKey, setUserKey] = useState({})
     const [messages, setMessages] = useState([]);
     const [users, setUsers] = useState([]);
 
@@ -26,18 +26,19 @@ const Chat = () => {
         socket.on("message", async (message) => {
             if (message.user.name === 'System') {
                 if (message.user.id !== undefined) {
-                    setUser(message.user)
-                    console.log(message.user)
-                    console.log(user)
+                    setUserKey({
+                        name: name?.toLowerCase(),
+                        serverPubKey: message.user.serverPubKey,
+                        priKey: message.user.priKey,
+                        room: message.user.room
+                    })
                 }
-                else {
-                    console.log(`can't set user info ${JSON.stringify(message)}`)
-                }
-            } else {
-                message.text = await decryptedText(message.text, user.priKey)
-                console.log(`decrypted msg ${message.text}`)
+                setMessages((exitstingMsgs) => [...exitstingMsgs, message]);
+            } else if (userKey.name !== message.user.name) {
+                console.log(`received encrypted message ${JSON.stringify(message)}`)
+                message.text = await decryptedText(message.text, userKey.priKey)
+                setMessages((exitstingMsgs) => [...exitstingMsgs, message]);
             }
-            setMessages((exitstingMsgs) => [...exitstingMsgs, message]);
         });
 
         socket.on("userList", ({roomUsers}) => {
@@ -48,14 +49,14 @@ const Chat = () => {
             socket.disconnect()
             socket.close();
         };
-    }, [name, room]);
+    }, [name, room, userKey.name, userKey.priKey]);
 
     const sendMessage = async (e) => {
         if (e.key === "Enter" && e.target.value) {
-            // socket.emit("message", e.target.value)
-            socket.emit("message", await encryptedText(e.target.value, user.serverPubKey));
+            // socket.emit("message", e.target.value.toLowerCase());
+            socket.emit("message", await encryptedText(e.target.value, userKey.serverPubKey));
+            setMessages((exitstingMsgs) => [...exitstingMsgs, {text: e.target.value, user:{name:name}}]);
             e.target.value = ""
-            // console.log(JSON.stringify(messages))
         }
     };
 
@@ -63,7 +64,7 @@ const Chat = () => {
         <div className="chat">
             <div className="user-list">
                 <div>User Name</div>
-                {users.map((user) => (
+                {users?.map((user) => (
                     <div key={user.id}>{user.name}</div>
                 ))}
             </div>
@@ -77,7 +78,7 @@ const Chat = () => {
                         {messages.map((message, index) => {
                             return <div
                                 key={index}
-                                className={`message ${name.toLowerCase() === message.user.name.toLowerCase() ? "self" : ""}`}
+                                className={`message ${name.toLowerCase() === message.user?.name?.toLowerCase() ? "self" : ""}`}
                             >
                                 <span className="user">{message.user.name}</span>
                                 <span className="message-text">{message.text}</span>
