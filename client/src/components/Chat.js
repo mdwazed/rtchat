@@ -9,6 +9,7 @@ let socket;
 const Chat = () => {
     const {search} = useLocation();
     const {name, room} = queryString.parse(search);
+    const [user, setUser] = useState({})
     const [messages, setMessages] = useState([]);
     const [users, setUsers] = useState([]);
 
@@ -19,9 +20,23 @@ const Chat = () => {
             if (error) {
                 alert(error);
             }
+
         });
 
-        socket.on("message", (message) => {
+        socket.on("message", async (message) => {
+            if (message.user.name === 'System') {
+                if (message.user.id !== undefined) {
+                    setUser(message.user)
+                    console.log(message.user)
+                    console.log(user)
+                }
+                else {
+                    console.log(`can't set user info ${JSON.stringify(message)}`)
+                }
+            } else {
+                message.text = await decryptedText(message.text, user.priKey)
+                console.log(`decrypted msg ${message.text}`)
+            }
             setMessages((exitstingMsgs) => [...exitstingMsgs, message]);
         });
 
@@ -37,11 +52,10 @@ const Chat = () => {
 
     const sendMessage = async (e) => {
         if (e.key === "Enter" && e.target.value) {
-            socket.emit("message", e.target.value);
-            const encMsg = await encryptedText(e.target.value)
-            const decMsg = await decryptedText(encMsg)
-            console.log(decMsg)
-            e.target.value = "";
+            // socket.emit("message", e.target.value)
+            socket.emit("message", await encryptedText(e.target.value, user.serverPubKey));
+            e.target.value = ""
+            // console.log(JSON.stringify(messages))
         }
     };
 
@@ -60,16 +74,15 @@ const Chat = () => {
                 </div>
                 <div className="chat-box">
                     <ScrollToBottom className="messages">
-                        {messages.map((message, index) => (
-
-                            <div
+                        {messages.map((message, index) => {
+                            return <div
                                 key={index}
-                                className={`message ${name === message.user ? "self" : ""}`}
+                                className={`message ${name.toLowerCase() === message.user.name.toLowerCase() ? "self" : ""}`}
                             >
-                                <span className="user">{message.user}</span>
+                                <span className="user">{message.user.name}</span>
                                 <span className="message-text">{message.text}</span>
                             </div>
-                        ))}
+                        })}
                     </ScrollToBottom>
                     <input placeholder="message" onKeyDown={sendMessage}/>
                 </div>

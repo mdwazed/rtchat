@@ -1,28 +1,29 @@
-import * as openpgp from 'openpgp'
+const openpgp = require('openpgp')
 
 let passPhrase = 'super long and hard to guess secret';
 
-export const encryptedText = async (plainText, serverPubKey) => {
+const encryptedText = async (plainText, userPubKey) => {
+
     return await openpgp.encrypt({
         message: await openpgp.createMessage({text: plainText}),
-        encryptionKeys: await openpgp.readKey({armoredKey: serverPubKey}),
+        encryptionKeys: await openpgp.readKey({armoredKey: userPubKey}),
     }).then(async (encryptedMessage) => {
         return encryptedMessage;
     })
 }
 
-export const decryptedText = async (encryptedMsg, priKey) => {
+const decryptedText = async (encryptedMsg, serverPriKey) => {
     const message = await openpgp.readMessage({armoredMessage: encryptedMsg})
     const {data: decrypted} = await openpgp.decrypt({
         message: message,
         decryptionKeys: await openpgp.decryptKey({
-            privateKey: await openpgp.readPrivateKey({armoredKey: priKey}),
+            privateKey: await openpgp.readPrivateKey({armoredKey: serverPriKey}),
             passphrase: passPhrase
         }),
     });
     return decrypted
 }
-
-// const encMsg = await encryptedText('Hello World')
-// const decMsg = await decryptedText(encMsg)
-// console.log(decMsg)
+module.exports = {
+    encryptedText,
+    decryptedText
+};

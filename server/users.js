@@ -1,6 +1,7 @@
 let users = [];
+let userPubKeys = [];
 
-const addUser = ({ id, name, room }) => {
+const addUser = ({id, name, room, key}) => {
     name = name.trim().toLowerCase();
     room = room.trim().toLowerCase();
 
@@ -9,7 +10,7 @@ const addUser = ({ id, name, room }) => {
     );
 
     if (existingUser) {
-        return { error: "User already exists!" };
+        return {error: "User already exists!"};
     }
 
     const user = {
@@ -19,7 +20,7 @@ const addUser = ({ id, name, room }) => {
     };
 
     users.push(user);
-
+    userPubKeys.push({name, key})
     return user;
 };
 
@@ -31,10 +32,9 @@ const removeUser = (id) => {
     }
 };
 
-const getUserById = (id) => {
-    const user = users.find((user) => user.id === id);
-    return user;
-};
+const getUserById = (id) => {return users.find((user) => user.id === id)}
+const getUserExceptId = (id) => {return users.filter((user) => user.id !== id)}
+const getKeyByUserName = (name) => {return userPubKeys.find((user) => user.name === name)}
 
 const getRoomUsers = (room) => {
     const roomUsers = users.filter((user) => user.room === room);
@@ -46,4 +46,6 @@ module.exports = {
     removeUser,
     getUserById,
     getRoomUsers,
+    getKeyByUserName,
+    getUserExceptId,
 };
