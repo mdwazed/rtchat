@@ -34,7 +34,7 @@ const Chat = () => {
                         room: message.user.room
                     })
                 }
-                setMessages((exitstingMsgs) => [...exitstingMsgs, message]);
+                if (!messages.map(m=>m.user.name).includes('System'))setMessages((exitstingMsgs) => [...exitstingMsgs, message]);
             } else if (userKey.name !== message.user.name) {
                 message.text = await decryptedText(message.text, userKey.priKey)
                 setMessages((exitstingMsgs) => [...exitstingMsgs, message]);
