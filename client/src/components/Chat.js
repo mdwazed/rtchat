@@ -17,10 +17,7 @@ const Chat = () => {
         socket = io("http://localhost:4000");
 
         socket.emit("join", {name, room}, (error) => {
-            if (error) {
-                alert(error);
-            }
-
+            if (error) alert(error)
         });
 
         socket.on("message", async (message) => {
@@ -55,7 +52,7 @@ const Chat = () => {
             const value = e.target.value
             socket.emit("message", await encryptedText(value, userKey.serverPubKey));
             console.log(`message is ${value}`)
-            setMessages((exitstingMsgs) => [...exitstingMsgs, {text: value, user:{name:name}}]);
+            setMessages((exitstingMsgs) => [...exitstingMsgs, {text: value, user: {name: name}}]);
             console.log(`message state updated ${messages}`)
             e.target.value = ""
         }

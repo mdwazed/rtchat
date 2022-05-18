@@ -1,6 +1,11 @@
 let users = [];
 let userPubKeys = [];
 
+/**
+ * @param {id, name, room, key}
+ * if user isn't exist already then add the user and then store user key and array
+ * @return user:{id, name, room}
+ * */
 const addUser = ({id, name, room, key}) => {
     name = name.trim().toLowerCase();
     room = room.trim().toLowerCase();
@@ -12,7 +17,6 @@ const addUser = ({id, name, room, key}) => {
     if (existingUser) {
         return {error: "User already exists!"};
     }
-
     const user = {
         id,
         name,
@@ -26,6 +30,7 @@ const addUser = ({id, name, room, key}) => {
     }
     return user;
 };
+
 
 const removeUser = (id) => {
     const index = users.findIndex((user) => user.id === id);
