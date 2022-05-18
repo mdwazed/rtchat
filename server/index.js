@@ -23,9 +23,14 @@ const io = socketIO(httpServer, {
     allowEIO3: true
 });
 
+
 app.get("/", (req, res) => res.send("Hello World!"));
 
-const getUserKey = async (name) => {
+/**
+ * @param name
+ * @return user key from userPubKeys array if exists else generate new keychain against provided username
+ * */
+let getUserKey = async (name) => {
     let key;
     if (getKeyByUserName(name)) {
         key = await getKeyByUserName(name).key
@@ -40,13 +45,17 @@ const getUserKey = async (name) => {
         console.log(`new key generated for ${name}`)
     }
     return key
-}
+};
+
+/**
+ * Socketio On Connection event
+ * */
 io.on("connection", (socket) => {
-    console.log("a user connected ", socket.id);
 
+    // Joining new user
     socket.on("join", async ({name, room}, callback) => {
-        console.log(`\nJoining New User ${name} to the room ${room}\n`)
 
+        // add new user and set keychain to the user
         let key = await getUserKey(name)
         const {error, user} = addUser({
             id: socket.id,
@@ -57,6 +66,7 @@ io.on("connection", (socket) => {
         if (error) {
             callback(error);
         }
+        // setup userData with keychain for sending initially to the user
         const userData = {
             id: socket.id,
             name: "System",
@@ -65,46 +75,51 @@ io.on("connection", (socket) => {
             priKey: key.privateKey
         }
 
+        // Joining room to the socket
         socket.join(room);
+
+        // sending user Keychain and welcome msg to the new joined user
         socket.emit("message", {
             user: userData,
             text: `welcome ${name} to ${room}.`,
         });
+
+        // Informing other user about joining a new user
         socket.broadcast.to(room).emit("message", {
             user: {name: "System"},
             text: `${name} just joined ${room}.`,
         });
 
+        // sending all user list related to the room
         const roomUsers = getRoomUsers(room);
         io.to(room).emit("userList", {roomUsers});
 
         callback();
     });
 
+    /**
+     * socket on message event is a builtin event of socketio which is used to receive all message
+     * */
     socket.on("message", async (message) => {
-        // await sendMessage(message, socket)
         const user = getUserById(socket.id);
-        console.log(`\n message sent by ${JSON.stringify(user)}`)
         // Todo Save decrypted msg to DB
-        console.log(`\n received encrypted message ${message}`)
         const decryptedMessage = await decryptedText(message, serverPrivateKey)
-        console.log(`\n decrypted message ${decryptedMessage}`)
+
+        /**
+         * Normally io.to(user.room).emit("message") event sent message to all user of the room but here
+         * we supposed only two user will join the room if one is sender other one will be receiver
+         */
         const users = getRoomUsers(user.room)
-        // console.log(`all users ${JSON.stringify(users)}`)
-
-
-        const recipient = users.filter((usr)=> usr.id !== user.id)
-        console.log(`\n recipient ${JSON.stringify(recipient)}`)
+        const recipient = users.filter((usr) => usr.id !== user.id)
         const userKeyChain = getKeyByUserName(recipient[0].name)
-        // console.log(`\n\n\nUser Key Chain ${JSON.stringify(userKeyChain)}\n\n\n`)
-        const encryptedMessage =  await encryptedText(decryptedMessage, userKeyChain.key.publicKey)
-        console.log(`\n sending encrypted message ${JSON.stringify(encryptedMessage)}`)
-        // broadcast msg as encrypted
+        const encryptedMessage = await encryptedText(decryptedMessage, userKeyChain.key.publicKey)
+        // broadcast encrypted msg to all users except sender
         io.to(user.room).emit("message", {
             user: user,
             text: encryptedMessage
         });
     });
+
 
     socket.on("disconnect", () => {
         const user = removeUser(socket.id);
@@ -120,7 +135,11 @@ io.on("connection", (socket) => {
 });
 
 httpServer.listen(port, async () => {
-    console.log(`Example app listening at http://localhost:${port}`)
+    console.log(`httpServer starting at http://localhost:${port}`)
+    /**
+     * generating keychain for server, on starting and then
+     * updating two global variable serverPrivateKey and serverPublicKey
+     * */
     const key = await openpgp.generateKey({
         type: 'rsa', // Type of the key
         rsaBits: 4096, // RSA key size (defaults to 4096 bits)
