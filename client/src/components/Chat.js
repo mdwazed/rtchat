@@ -35,7 +35,6 @@ const Chat = () => {
                 }
                 setMessages((exitstingMsgs) => [...exitstingMsgs, message]);
             } else if (userKey.name !== message.user.name) {
-                console.log(`received encrypted message ${JSON.stringify(message)}`)
                 message.text = await decryptedText(message.text, userKey.priKey)
                 setMessages((exitstingMsgs) => [...exitstingMsgs, message]);
             }
@@ -53,9 +52,11 @@ const Chat = () => {
 
     const sendMessage = async (e) => {
         if (e.key === "Enter" && e.target.value) {
-            // socket.emit("message", e.target.value.toLowerCase());
-            socket.emit("message", await encryptedText(e.target.value, userKey.serverPubKey));
-            setMessages((exitstingMsgs) => [...exitstingMsgs, {text: e.target.value, user:{name:name}}]);
+            const value = e.target.value
+            socket.emit("message", await encryptedText(value, userKey.serverPubKey));
+            console.log(`message is ${value}`)
+            setMessages((exitstingMsgs) => [...exitstingMsgs, {text: value, user:{name:name}}]);
+            console.log(`message state updated ${messages}`)
             e.target.value = ""
         }
     };
@@ -80,7 +81,7 @@ const Chat = () => {
                                 key={index}
                                 className={`message ${name.toLowerCase() === message.user?.name?.toLowerCase() ? "self" : ""}`}
                             >
-                                <span className="user">{message.user.name}</span>
+                                <span className="user">{message.user.name.toUpperCase()}</span>
                                 <span className="message-text">{message.text}</span>
                             </div>
                         })}
