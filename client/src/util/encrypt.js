@@ -1,7 +1,13 @@
 import * as openpgp from 'openpgp'
 
-let passPhrase = 'super long and hard to guess secret';
+let passPhrase = 'super long and hard to guess secret'; // passphrase is same for both client and server
 
+/**
+ * @param plainText
+ * @param serverPubKey
+ * encrypt plain message using server public key as though the server can easily decrypt the message
+ * @return encrypted message
+ * */
 export const encryptedText = async (plainText, serverPubKey) => {
     return await openpgp.encrypt({
         message: await openpgp.createMessage({text: plainText}),
@@ -11,6 +17,13 @@ export const encryptedText = async (plainText, serverPubKey) => {
     })
 }
 
+/**
+ * @param encryptedMsg
+ * @param priKey
+ * receive the message was encrypted using sender public key and decrypted this
+ * encrypted message using sender private key which was stored to the server
+ * @return decrypted plain message
+ * */
 export const decryptedText = async (encryptedMsg, priKey) => {
     const message = await openpgp.readMessage({armoredMessage: encryptedMsg})
     const {data: decrypted} = await openpgp.decrypt({
@@ -22,7 +35,3 @@ export const decryptedText = async (encryptedMsg, priKey) => {
     });
     return decrypted
 }
-
-// const encMsg = await encryptedText('Hello World')
-// const decMsg = await decryptedText(encMsg)
-// console.log(decMsg)

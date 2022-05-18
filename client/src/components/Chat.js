@@ -16,10 +16,14 @@ const Chat = () => {
     useEffect(() => {
         socket = io("http://localhost:4000");
 
+        // alerting if any error raised during joining the user
         socket.emit("join", {name, room}, (error) => {
             if (error) alert(error)
         });
 
+        /**
+         * receiving message and decrypting them if encrypted then store them to react state
+         * */
         socket.on("message", async (message) => {
             if (message.user.name === 'System') {
                 if (message.user.id !== undefined) {
@@ -51,9 +55,7 @@ const Chat = () => {
         if (e.key === "Enter" && e.target.value) {
             const value = e.target.value
             socket.emit("message", await encryptedText(value, userKey.serverPubKey));
-            console.log(`message is ${value}`)
             setMessages((exitstingMsgs) => [...exitstingMsgs, {text: value, user: {name: name}}]);
-            console.log(`message state updated ${messages}`)
             e.target.value = ""
         }
     };
