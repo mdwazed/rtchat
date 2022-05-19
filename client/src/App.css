@@ -8,7 +8,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #484848;
 }
 
 .join {
@@ -125,4 +124,30 @@
   background-color: #0099ff;
   color: white;
   align-items: flex-end;
+}
+.call {
+  margin-left: auto;
+  margin-right: 15px;
+  cursor: pointer;
+}
+.decline-call {
+  background: red;
+  border-radius: 50%;
+  height: 50px;
+  width: 50px;
+  line-height: 50px;
+  font-size: 20px;
+  color: #f1f0f0;
+  text-align: center;
+  margin: 0 auto;
+}
+.receive-call {
+  background: green;
+  border-radius: 50%;
+  height: 50px;
+  width: 50px;
+  line-height: 50px;
+  font-size: 20px;
+  color: #f1f0f0;
+  margin: 0 auto;
 }

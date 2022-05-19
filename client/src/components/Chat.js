@@ -60,6 +60,10 @@ const Chat = () => {
         }
     };
 
+    const openCallWindow = () => {
+        window.open('http://localhost:3000/call','Data','height=250,width=250');
+    }
+
     return (
         <div className="chat">
             <div className="user-list">
@@ -71,6 +75,7 @@ const Chat = () => {
             <div className="chat-section">
                 <div className="chat-head">
                     <div className="room">{room}</div>
+                    <i className='bx bxs-phone-call call' onClick={openCallWindow} />
                     <Link to="/">X</Link>
                 </div>
                 <div className="chat-box">
