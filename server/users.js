@@ -18,7 +18,7 @@ const addUser = ({id, name, room, key}) => {
         return {error: "User already exists!"};
     }
     const user = {
-        id,
+        _id:id,
         name,
         room,
     };
@@ -33,7 +33,7 @@ const addUser = ({id, name, room, key}) => {
 
 
 const removeUser = (id) => {
-    const index = users.findIndex((user) => user.id === id);
+    const index = users.findIndex((user) => user._id === id);
 
     if (index !== -1) {
         return users.splice(index, 1)[0];
@@ -41,7 +41,7 @@ const removeUser = (id) => {
 };
 
 const getUserById = (id) => {
-    return users.find((user) => user.id === id)
+    return users.find((user) => user._id === id)
 }
 const getKeyByUserName = (name) => {
     return userPubKeys.find((user) => user.name === name.toLowerCase())
